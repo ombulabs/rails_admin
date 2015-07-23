@@ -18,6 +18,7 @@ module RailsAdmin
           @action = action.with({controller: self, abstract_model: @abstract_model, object: @object})
           fail(ActionNotAllowed) unless @action.enabled?
           @page_name = wording_for(:title)
+          normalize_for_boolean if params['f']
 
           instance_eval &@action.controller
         end
@@ -75,6 +76,25 @@ module RailsAdmin
 
       reversed_sort = (field ? field.sort_reverse? : model_config.list.sort_reverse?)
       {sort: column, sort_reverse: (params[:sort_reverse] == reversed_sort.to_s)}
+    end
+
+    def normalize_for_boolean
+      attribute_names = params["f"].each do |filter|
+        next unless filter
+        model = params["model_name"].classify.constantize
+        type = model.columns_hash[filter[0]].type
+        if type == :boolean
+          filter[1].each do |values|
+            next unless values
+            if values[1]["v"] == "_present"
+              params["f"][filter.first].first[1]["v"] = "true"
+            end
+            if values[1]["v"] == "_blank"
+              params["f"][filter.first].first[1]["v"] = "false"
+            end
+          end
+        end
+      end
     end
 
     def redirect_to_on_success
