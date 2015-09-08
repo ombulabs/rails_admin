@@ -88,8 +88,7 @@ module RailsAdmin
             next unless values
             if values[1]["v"] == "_present"
               params["f"][filter.first].first[1]["v"] = "true"
-            end
-            if values[1]["v"] == "_blank"
+            elsif values[1]["v"] == "_blank"
               params["f"][filter.first].first[1]["v"] = "false"
             end
           end
