@@ -79,9 +79,9 @@ module RailsAdmin
     end
 
     def normalize_for_boolean
+      model = params["model_name"].classify.constantize
       attribute_names = params["f"].each do |filter|
         next unless filter
-        model = params["model_name"].classify.constantize
         type = model.columns_hash[filter[0]].type
         if type == :boolean
           filter[1].each do |values|
